@@ -15,7 +15,7 @@ linear_cross_entropy = [
 ]
 
 [project]
-name = "linear-xent-fusion"
+name = "linear-cross-entropy"
 version = "0.1"
 dependencies = [
   "torch>=2.3.0",
