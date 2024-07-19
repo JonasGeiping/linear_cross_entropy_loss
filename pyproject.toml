@@ -5,8 +5,11 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["linear_cross_entropy"]
+
 [tool.setuptools.package-data]
-linear_xent = [
+linear_cross_entropy = [
     "LICENSE",
     "README.md",
 ]
