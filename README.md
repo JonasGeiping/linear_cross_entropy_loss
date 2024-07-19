@@ -10,7 +10,7 @@ than the baseline, without being slower (see benchmarks shown below and in the `
 
 This solution owes a lot to the implementation of `mgmalek`, which is posted here: https://github.com/mgmalek/efficient_cross_entropy.
 You can think of this implementation as a more feature-complete version of the same chunking strategy, with gains through additional fusions
-of everything else into matrix multiplications prologues/epilogues, and some changes to preserve accuracy. The whole thing was written after reading 
+of everything else into matrix multiplication prologues/epilogues, and some changes to preserve accuracy. The whole thing was written after reading 
 https://github.com/pytorch/pytorch/issues/124480, which contains a lot of interesting input from `YouJiacheng` and from the PyTorch team. 
 I somewhat assume that this kind of performance optimization will eventually be entirely subsumed by improvements to `torch.compile`.
 
