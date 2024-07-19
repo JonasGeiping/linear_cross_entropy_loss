@@ -1,0 +1,58 @@
+[build-system]
+requires = [
+    "setuptools>=68.2.2",
+    "wheel>=0.41.2",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+linear_xent = [
+    "LICENSE",
+    "README.md",
+]
+
+[project]
+name = "linear-xent-fusion"
+version = "0.1"
+dependencies = [
+  "torch>=2.3.0",
+  "triton>=3.0.0"
+]
+requires-python = ">= 3.11"
+
+
+authors = [
+  {name = "Jonas Geiping"},
+]
+
+description = "A simple fusion of a linear layer and a cross entropy loss, written in pytorch+triton."
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["pytorch", "triton", "operator-fusion", "LLM"]
+classifiers = [
+  "Development Status :: 0 - terrible",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "thisgithubpage"
+Documentation = "thisgithubpage"
+Repository = "thisgithubpage"
+"Bug Tracker" = "thisgithubpage/issues"
+
+
+
+
+[tool.black]
+line-length = 120
+
+[tool.pyright]
+include = ["linear_xent"]
+exclude = ["**/__pycache__", "**/*ipynb*"]
+
+pythonVersion = "3.11"
+pythonPlatform = "Linux"
+# ignores
+reportPrivateImportUsage = false
+reportIncompatibleMethodOverride = false
+typeCheckingMode = "basic"
