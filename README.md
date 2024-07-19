@@ -60,7 +60,7 @@ variables as a dictionary in  `module.metrics`. These are
 - Input `x` (input embeddings): :math:`(*, H_{in})` where :math:`*` means any number of
     dimensions including none and :math:`H_{in} = \text{in\_features}`.
 - Input `y` (labels): :math:`(*)` This should be a `torch.long` tensor with the same number of elements,`(*)`,
-    as the input embeeddings.
+    as the input embeddings.
 - Output: :math:`(1,)` This function always returns the fully reduced loss.
 
 ### Attributes:
