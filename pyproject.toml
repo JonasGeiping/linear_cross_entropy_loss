@@ -35,10 +35,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "thisgithubpage"
-Documentation = "thisgithubpage"
-Repository = "thisgithubpage"
-"Bug Tracker" = "thisgithubpage/issues"
+Homepage = "https://github.com/JonasGeiping/linear_cross_entropy_loss"
+Documentation = "https://github.com/JonasGeiping/linear_cross_entropy_loss"
+Repository = "https://github.com/JonasGeiping/linear_cross_entropy_loss"
+"Bug Tracker" = "https://github.com/JonasGeiping/linear_cross_entropy_loss/issues"
 
 
 
