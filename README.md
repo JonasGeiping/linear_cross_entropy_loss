@@ -23,7 +23,7 @@ I somewhat assume that this kind of performance optimization will eventually be 
     >>> loss = module(x, y)
 
 
-LinearCrossEntropyLoss applies a linear transformation to the incoming data `z = xA^T` and then immediately
+`LinearCrossEntropyLoss` applies a linear transformation to the incoming data `z = xA^T` and then immediately
         computes the cross entropy loss of z with a tensor of labels y `L(z, y)`, and returns this loss as a scalar value.
 
 ### Caveats:
