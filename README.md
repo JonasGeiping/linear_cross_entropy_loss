@@ -1,16 +1,16 @@
 # LinearCrossEntropyLoss
 
-This is a fused implementation that combines a `torch.nn.Linear` layer and a `torch.nn.CrossEntropLoss` into a single module.
-The fused implementation can save a lot of memory, especially in usecases in language modeling where sequence lengths or batch sizes are long
+This is a fused implementation that combines `torch.nn.Linear` layer and `torch.nn.CrossEntropLoss` into a single module.
+This kind of fused implementation can save a lot of activation memory, especially in usecases in language modeling where sequence lengths or batch sizes are long
 and vocabulary sizes are massive. Compared to a baseline implementation, which may materialize 2-3 tensors of size `batch_size x seq_length x vocabulary_size x 4`, this module will only materialize a single tensor of size
 ```N_chunk_size x vocabulary_size x 4``` bytes at its peak. `N_chunk_size` is a user-controlled variable.
 
 As an additional benefit, the implementation is a bit more careful about floating point operations and, in my tests, noticeably more accurate 
-than the baseline.
+than the baseline, without being slower (see benchmarks shown below and in the `bench` folders).
 
-This solution owes a lot to `mgmalek`s solution, which is posted here: https://github.com/mgmalek/efficient_cross_entropy
+This solution owes a lot to the implementation of `mgmalek`, which is posted here: https://github.com/mgmalek/efficient_cross_entropy.
 You can think of this implementation as a more feature-complete version of the same chunking strategy, with gains through additional fusions
-of everything else into the matrix multiplications, and some changes to preserve accuracy. The whole thing was written after reading 
+of everything else into matrix multiplications prologues/epilogues, and some changes to preserve accuracy. The whole thing was written after reading 
 https://github.com/pytorch/pytorch/issues/124480, which contains a lot of interesting input from `YouJiacheng` and from the PyTorch team. 
 I somewhat assume that this kind of performance optimization will eventually be entirely subsumed by improvements to `torch.compile`.
 
@@ -23,8 +23,8 @@ I somewhat assume that this kind of performance optimization will eventually be 
     >>> loss = module(x, y)
 
 
-LinearCrossEntropyLoss applies a linear transformation to the incoming data: :math:`z = xA^T` and then immediately
-        computes the cross entropy loss of z with a tensor of labels y, and returns the loss as a scalar value.
+LinearCrossEntropyLoss applies a linear transformation to the incoming data `z = xA^T` and then immediately
+        computes the cross entropy loss of z with a tensor of labels y `L(z, y)`, and returns this loss as a scalar value.
 
 ### Caveats:
 * All dimensions need to be divisible by sufficiently large powers of 2
@@ -36,8 +36,9 @@ LinearCrossEntropyLoss applies a linear transformation to the incoming data: :ma
 * This function will call a (substantial) triton autotune list the first time it is called. You can reduce or change the number of evaluated
     configs by modifying `linear_cross_entropy.fwd_configs` and `linear_cross_entropy.bwd_configs`.
 * Be careful when auto-casting this module. Right now, the code default to auto-casting to `float16`. This might not be what you need.
+* If you want to use this module for *inference*, you should re-enable checks so that the backward function only triggers if `weight.requires_grad` is `True`. (I didn't do this by default because it is incompatible with `autocast`.)
 
-### A Note on Monitoring:
+### Monitoring:
 Setting `LinearCrossEntropyLoss(4096, 16384).monitoring = True` will additionally accumulate a number of monitoring
 variables as a dictionary in  `module.metrics`. These are
 * Logit Norm
