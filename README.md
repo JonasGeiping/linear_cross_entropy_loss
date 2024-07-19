@@ -24,7 +24,7 @@ I somewhat assume that this kind of performance optimization will eventually be 
 
 
 `LinearCrossEntropyLoss` applies a linear transformation to the incoming data `z = xA^T` and then immediately
-        computes the cross entropy loss of z with a tensor of labels y `L(z, y)`, and returns this loss as a scalar value.
+        computes the cross entropy loss of z with a tensor of labels y, `L(z, y)`, which it returns as a scalar value.
 
 ### Caveats:
 * All dimensions need to be divisible by sufficiently large powers of 2
