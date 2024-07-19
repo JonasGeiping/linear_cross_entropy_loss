@@ -85,6 +85,8 @@ The benchmarking script is `bench_fusions.py`.
 
 ![Accuracy Benchmark](bench-acc/bwd-fp16-Linear+Loss-Accuracy-over-N.-Defaults:-N=B*S=16384,-H=2048,-V=131072.png)
 
+For reference, the benchmarked version of `torch.compile` is the nightly from the 15th of July, 2024.
+
 # Final Notes
 
 This solution of "z/logit chunks in SRAM" is still quite unsatisfying to me. I would prefered not to ever materialize the logits in
