@@ -89,7 +89,7 @@ For reference, the benchmarked version of `torch.compile` is the nightly from th
 
 # Final Notes
 
-This solution of "z/logit chunks in SRAM" is still quite unsatisfying to me. I would prefered not to ever materialize the logits in
+This solution of "z/logit chunks in SRAM" is still quite unsatisfying to me. I would have prefered not to ever materialize the logits in
 main memory, but have so far failed to find a scalable solution to that end. You can find a graveyard of bad alternatives in the `variants`
 folder. The problem that I've run into is that the hidden dimensions I care about are to large to keep large chunks cached, leading to 
-extensive traffic from and to the cache that kills performance.
+extensive traffic to and from the cache that kills performance.
