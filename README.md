@@ -17,9 +17,9 @@ I somewhat assume that this kind of performance optimization will eventually be 
 
 # Usage 
     >>> from linear_cross_entropy import LinearCrossEntropyLoss
-    >>> module = LinearCrossEntropyLoss(4096, 16384)
-    >>> x = torch.randn(4, 512, 4096, device=torch.device("cuda"))
-    >>> y = torch.randn(4, 512, device=torch.device("cuda"), dtype=torch.long)
+    >>> module = LinearCrossEntropyLoss(2048, 16384).cuda()
+    >>> x = torch.randn(4, 512, 2048, device=torch.device("cuda"))
+    >>> y = torch.randint(0, 16384, (4, 512), device=torch.device("cuda"), dtype=torch.long)
     >>> loss = module(x, y)
 
 
@@ -28,6 +28,7 @@ I somewhat assume that this kind of performance optimization will eventually be 
 
 ### Caveats:
 * All dimensions need to be divisible by sufficiently large powers of 2
+* This works only on devices where triton works.
 * Monitoring is optional and turned off by default.
 * Speed-ups over a compiled torch baseline only materialize in float 16 with sufficiently large vocabulary sizes / numbers of classes
     or very long sequences or batch sizes.
@@ -38,13 +39,25 @@ I somewhat assume that this kind of performance optimization will eventually be 
 * Be careful when auto-casting this module. Right now, the code default to auto-casting to `float16`. This might not be what you need.
 * If you want to use this module for *inference*, you should re-enable checks so that the backward function only triggers if `weight.requires_grad` is `True`. (I didn't do this by default because it is incompatible with `autocast`.)
 
+
+### Troubleshooting:
+If you observe 
+```
+    raise OutOfResources(self.metadata.shared, max_shared, "shared memory")
+triton.runtime.errors.OutOfResources: out of resource: shared memory, Required: 131072, Hardware limit: 101376. Reducing block sizes or `num_stages` may help.
+```
+then one of the auto-tuned block configurations does not fit onto your card. This is very possible if you use a non-standard GPU. To fix this, enable print-outs of the current configuration (look for the `tl.static_print` statements) and then disable the offending auto-tune configurations (or add new ones that fit your device better).
+
+If you observe issues related to `custom_fwd`, then this is related to the `torch.autocast` decorators. If you don't use autocast, you can safely remove the decorators on the forward and backward pass.
+
 ### Monitoring:
-Setting `LinearCrossEntropyLoss(4096, 16384).monitoring = True` will additionally accumulate a number of monitoring
+Setting `LinearCrossEntropyLoss(2048, 16384).monitoring = True` will additionally accumulate a number of monitoring
 variables as a dictionary in  `module.metrics`. These are
 * Logit Norm
 * Maximal logit value
 * Logit Entropy
 * z-regularization value.
+Note: norm and entropy values are a constant away from what you might expect.
 
 
 ### Args:

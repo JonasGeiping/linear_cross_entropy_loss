@@ -157,7 +157,8 @@ def linear_xent_fwd_prep_bwd_kernel_matmul_t(
     idx_V_group = tl.program_id(axis=1)
     num_idx_N, num_idx_V_group = tl.num_programs(0), tl.num_programs(1)
     idx_N, idx_V_group = tl.swizzle2d(idx_N, idx_V_group, num_idx_N, num_idx_V_group, GROUP_SIZE)  # type:ignore
-    tl.static_print(N_group, V_BLOCK_SIZE, N_BLOCK_SIZE, H_BLOCK_SIZE, GROUP_SIZE, monitoring)
+    # tl.static_print(N_group, V_BLOCK_SIZE, N_BLOCK_SIZE, H_BLOCK_SIZE, GROUP_SIZE, monitoring)
+
     R = tl.load(reduction_ptr, eviction_policy="evict_last")
     V_GROUP_SIZE: tl.constexpr = V_BLOCK_SIZE
     x_block_ptr = tl.make_block_ptr(
@@ -588,7 +589,7 @@ def linear_xent_bwd_dispatcher(
 ):
 
     idx_NV = tl.program_id(axis=0)
-    tl.static_print(V_BLOCK_SIZE, N_BLOCK_SIZE, H_BLOCK_SIZE, GROUP_SIZE, SPLIT_N, SPLIT_V, monitoring)
+    # tl.static_print(V_BLOCK_SIZE, N_BLOCK_SIZE, H_BLOCK_SIZE, GROUP_SIZE, SPLIT_N, SPLIT_V, monitoring)
     if idx_NV < (N_group // N_BLOCK_SIZE * SPLIT_V):
         linear_xent_bwd_kernel_matmul_t_epilogue_dx(
             logits_ptr,
@@ -658,7 +659,7 @@ def linear_xent_bwd_dispatcher(
 class LinearXentImplementation(torch.autograd.Function):
     logged_best_config_once = False
 
-    @torch._dynamo.disable()
+    # @torch._dynamo.disable()
     @torch.amp.custom_fwd(device_type="cuda", cast_inputs=torch.float16)
     # float16 is technically more accurate, and also faster due to freedom to use atomic ops and split V
     # but, I don't know how to tell autocast to cast to the correct cast_inputs for both fp16 and bf16
@@ -791,10 +792,10 @@ class LinearXentImplementation(torch.autograd.Function):
                 logit_ent = logit_ent_local.sum()
                 ctx.mark_non_differentiable(z_reg_value, logit_max, logit_ent, logit_norm)
                 ctx.save_for_backward(x_grad.view_as(x_in), At_grad)
-                if not LinearXentImplementation.logged_best_config_once:
-                    print("fwd", linear_xent_fwd_prep_bwd_kernel_matmul_t.best_config)
-                    print("bwd", linear_xent_bwd_dispatcher.best_config)
-                    LinearXentImplementation.logged_best_config_once = True
+                # if not LinearXentImplementation.logged_best_config_once:
+                #     print("fwd", linear_xent_fwd_prep_bwd_kernel_matmul_t.best_config)
+                #     print("bwd", linear_xent_bwd_dispatcher.best_config)
+                #     LinearXentImplementation.logged_best_config_once = True
 
             return lse_sum + losses.sum(), z_reg_value, logit_max, logit_ent, logit_norm
 
@@ -840,7 +841,7 @@ class LinearCrossEntropyLoss(torch.nn.Linear):  # an instance of nn.Linear to be
     * Be careful when auto-casting this module. Right now, the code default to auto-casting to `float16`. This might not be what you need.
 
     Note (Monitoring):
-    Setting `LinearCrossEntropyLoss(4096, 16384).monitoring = True` will additionally accumulate a number of monitoring
+    Setting `self.monitoring = True` will additionally accumulate a number of monitoring
     variables as a dictionary in  `module.metrics`. These are
     * Logit Norm
     * Maximal logit value
@@ -877,8 +878,10 @@ class LinearCrossEntropyLoss(torch.nn.Linear):  # an instance of nn.Linear to be
     Examples::
 
         >>> from linear_cross_entropy import LinearCrossEntropyLoss
-        >>> module = LinearCrossEntropyLoss(4096, 16384)
-        >>> loss = module(torch.randn(4, 512, 4096, device=torch.device("cuda")))
+        >>> module = LinearCrossEntropyLoss(2048, 16384).cuda()
+        >>> x = torch.randn(4, 512, 2048, device=torch.device("cuda"))
+        >>> y = torch.randint(0, 16384, (4, 512), device=torch.device("cuda"), dtype=torch.long)
+        >>> loss = module(x, y)
 
     """
 
