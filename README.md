@@ -57,6 +57,7 @@ variables as a dictionary in  `module.metrics`. These are
 * Maximal logit value
 * Logit Entropy
 * z-regularization value.
+  
 Note: norm and entropy values are a constant away from what you might expect.
 
 
