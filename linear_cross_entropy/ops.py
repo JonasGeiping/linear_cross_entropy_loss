@@ -880,8 +880,8 @@ class LinearCrossEntropyLoss(torch.nn.Linear):  # an instance of nn.Linear to be
     Examples::
 
         >>> from linear_cross_entropy import LinearCrossEntropyLoss
-        >>> module = LinearCrossEntropyLoss(2048, 16384).cuda()
-        >>> x = torch.randn(4, 512, 2048, device=torch.device("cuda"))
+        >>> module = LinearCrossEntropyLoss(2048, 16384).cuda().half()
+        >>> x = torch.randn(4, 512, 2048, dtype=torch.float16, device=torch.device("cuda"))
         >>> y = torch.randint(0, 16384, (4, 512), device=torch.device("cuda"), dtype=torch.long)
         >>> loss = module(x, y)
 
