@@ -114,6 +114,7 @@ fwd_configs = [
         # "perf_model": lambda: 1,
         # "top_k": 10,
     },
+    reset_to_zero=["z_nv_ptr", "logit_norm_ptr", "lse_ptr", "m_ptr", "losses_ptr"],
     # warmup=100,
     # rep=500,
 )
@@ -548,6 +549,7 @@ bwd_configs = [
         # "perf_model": lambda: 1,
         # "top_k": 10,
     },
+    reset_to_zero=["x_grad", "At_grad", "logit_entropy_local"],
     # warmup=100,
     # rep=500,
 )
